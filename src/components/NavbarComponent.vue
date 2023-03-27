@@ -42,7 +42,7 @@ export default {
                     </li>
                     <li class="nav-item">
                         <a href="/carrinho" class="nav-link active"><i class="bi bi-cart-fill mx-1"></i>Carrinho <span
-                                class="badge bg-dark">{{ carrinho }}</span></a>
+                                class="badge bg-primary">{{ carrinho }}</span></a>
                     </li>
                     <li class="nav-item" v-if="isLoggedIn">
                         <div class="btn-group">
