@@ -1,5 +1,5 @@
 <script>
-import { auth } from "../firebase"
+import { auth } from "../firebase/index"
 const cart = JSON.parse(localStorage.getItem('carrinho'))
 
 export default {

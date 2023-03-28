@@ -1,14 +1,28 @@
-import { createApp } from 'vue'
+import { createApp, markRaw } from 'vue'
 import { createPinia } from 'pinia'
+import { auth } from "./firebase/index"
 
 import App from './App.vue'
 import router from './router'
 
 import './assets/css/main.css'
 
-const app = createApp(App)
+let app
 
-app.use(createPinia())
-app.use(router)
+auth.onAuthStateChanged(user => {
+    if (!app) {
+        const app = createApp(App)
 
-app.mount('#app')
+        const pinia = createPinia()
+
+        pinia.use(({ store }) => {
+            store.$router = markRaw(router)
+        })
+
+        app.use(pinia)
+
+        app.use(router)
+
+        app.mount('#app')
+    }
+})
