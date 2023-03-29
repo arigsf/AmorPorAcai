@@ -34,7 +34,7 @@ export default {
 <template>
     <nav class="navbar navbar-expand-lg border-bottom bg-purple-dark" data-bs-theme="dark">
         <div class="container-fluid">
-            <a href="/" class="navbar-brand">MyBurger</a>
+            <a href="/" class="navbar-brand">Amor por Açaí</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
