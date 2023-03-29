@@ -1,3 +1,13 @@
+<script setup>
+import { useUserStore } from "../stores/user"
+
+const userStore = useUserStore()
+
+const logout = () => {
+    userStore.logout()
+}
+</script>
+
 <script>
 import { auth } from "../firebase/index"
 const cart = JSON.parse(localStorage.getItem('carrinho'))

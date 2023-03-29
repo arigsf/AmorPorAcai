@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import { auth } from "../firebase/index"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth"
 
 export const useUserStore = defineStore("user", {
     state: () => {
@@ -12,10 +12,9 @@ export const useUserStore = defineStore("user", {
         async register(email, senha, nome, endereco) {
             try {
                 await createUserWithEmailAndPassword(auth, email, senha)
-                auth.currentUser.displayName = nome
-                auth.currentUser.photoURL = endereco
+                await updateProfile(auth.currentUser, { displayName: nome, photoURL: endereco })
                 this.user = auth.currentUser
-                this.$router.push("/")
+                this.$router.go({ path: this.$router.path })
             } catch (error) {
                 if (error.code == "auth/email-already-in-use") {
                     alert("Email já está em uso!")
@@ -30,7 +29,7 @@ export const useUserStore = defineStore("user", {
             try {
                 await signInWithEmailAndPassword(auth, email, senha)
                 this.user = auth.currentUser
-                this.$router.push("/")
+                this.$router.go({ path: this.$router.path })
             } catch (error) {
                 if (error.code == "auth/user-not-found") {
                     alert("Email e/ou senha incorretos!")
@@ -42,6 +41,11 @@ export const useUserStore = defineStore("user", {
                     alert("Ocorreu um erro ao logar! Código do erro: " + error.code)
                 }
             }
+        },
+        async logout(){
+            await signOut(auth)
+            this.user = null
+            this.$router.go({ path: this.$router.path })
         }
     }
 })
