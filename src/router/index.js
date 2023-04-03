@@ -20,6 +20,11 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue')
     },
     {
+      path: '/acai/:acai',
+      name: 'acai',
+      component: () => import('../views/AcaiView.vue')
+    },
+    {
       path: '/carrinho',
       name: 'carrinho',
       component: () => import('../views/RegisterView.vue'),

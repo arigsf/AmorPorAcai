@@ -1,3 +1,32 @@
+<script>
+import { collection, getDocs } from "firebase/firestore"
+import { db } from "../firebase"
+
+export default {
+  name: 'HomeView',
+  data() {
+    return {
+      acais: null
+    }
+  },
+  async created() {
+    const querySnapshot = await getDocs(collection(db, "acais"))
+    let results = []
+    querySnapshot.forEach((doc) => {
+      const acai = {
+        id: doc.id,
+        incluso: doc.data().incluso,
+        preco: doc.data().preco,
+        slug: doc.data().slug,
+        titulo: doc.data().titulo
+      }
+      results.push(acai)
+    })
+    this.acais = results
+  }
+}
+</script>
+
 <template>
   <section>
     <div class="p-4 bg-purple-dark text-white">
@@ -20,20 +49,18 @@
     </div>
     <div class="p-4 bg-purple-white">
       <div id="acais" class="row row-cols-1 row-cols-md-3 mb-3 text-center w-75 mx-auto my-5">
-        <div class="col">
+        <div class="col" v-for="acai in acais">
           <div class="card text-bg-light mb-4 rounded-3 shadow-sm">
             <div class="card-header py-3">
-              <h4 class="my-0 fw-normal">Açaí </h4>
+              <h4 class="my-0 fw-normal">{{ acai.titulo }}</h4>
             </div>
             <div class="card-body">
-              <h1 class="card-title pricing-card-title"><span class="fs-6">a partir de </span>R$0</h1>
+              <h1 class="card-title pricing-card-title">R${{ acai.preco }}</h1>
               <ul class="list-unstyled mt-3 mb-4">
-                <li>10 users included</li>
-                <li>2 GB of storage</li>
-                <li>Email support</li>
-                <li>Help center access</li>
+                <li v-for="incluso in acai.incluso">{{ incluso }}</li>
               </ul>
-              <a href="/acai/" class="w-100 btn btn-lg btn-outline-primary">Quero esse</a>
+              <router-link class="w-100 btn btn-lg btn-outline-primary"
+                v-bind:to="{ name: 'acai', params: { acai: acai.slug } }">Quero esse</router-link>
             </div>
           </div>
         </div>
