@@ -1,13 +1,14 @@
 <script>
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
+import { onMounted } from "vue"
 
 export default {
     name: 'AcaiView',
     data() {
         return {
             acai: null,
-            adicionais: null
+            adicionais: []
         }
     },
     async created() {
@@ -22,8 +23,72 @@ export default {
             }
             this.acai = result
         })
+        const querySnapshot2 = await getDocs(query(collection(db, "adicionais")))
+        querySnapshot2.forEach((doc) => {
+            const result = {
+                avancados: doc.data().avancados,
+                basicos: doc.data().basicos,
+                entrega: doc.data().entrega
+            }
+            this.adicionais = result
+        })
     }
 }
 </script>
 
-<template></template>
+<template>
+    <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card bg-purple-white text-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ acai.titulo }}</h5>
+                        <ul class="my-0">
+                            <li v-for="incluso in acai.incluso">{{ incluso }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card bg-purple-white text-white mb-3">
+                    <div class="card-body d-flex justify-content-between">
+                        <h5 class="card-title">Seu açaí até o momento</h5>
+                        <p class="fs-5 fw-semibold m-0">R${{ preco }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary"><i class="bi bi-cart-plus-fill"></i> Adicionar ao carrinho</button>
+
+            </div>
+            <div class="col-md-5">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="d-flex flex-column flex-md-row justify-content-center">
+                            <div class="list-group list-group-checkable gap-2 border-0">
+                                <p class="fs-6 fw-semibold m-0">Adicionais básicos</p>
+                                <div v-for="basico in adicionais.basicos">
+                                    <input class="list-group-item-check pe-none" type="checkbox" name="basicos"
+                                        v-bind:id="basico" v-bind:value="basico">
+                                    <label class="list-group-item rounded-3 py-2" v-bind:for="basico">
+                                        {{ basico }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column flex-md-row justify-content-center">
+                            <div class="list-group list-group-checkable gap-2 border-0">
+                                <p class="fs-6 fw-semibold m-0">Adicionais avançados</p>
+                                <div v-for="avancado in adicionais.avancados">
+                                    <input class="list-group-item-check pe-none" type="checkbox" name="avancados"
+                                        v-bind:id="avancado" v-bind:value="avancado">
+                                    <label class="list-group-item rounded-3 py-2" v-bind:for="avancado">
+                                        {{ avancado }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</template>
