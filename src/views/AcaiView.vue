@@ -1,14 +1,18 @@
 <script>
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
-import { onMounted } from "vue"
+import { ref } from "vue"
+
+const basicos = ref([])
+const avancados = ref([])
 
 export default {
     name: 'AcaiView',
     data() {
         return {
             acai: null,
-            adicionais: []
+            adicionais: [],
+            preco: null
         }
     },
     async created() {
@@ -22,6 +26,7 @@ export default {
                 titulo: doc.data().titulo
             }
             this.acai = result
+            this.preco = result.preco
         })
         const querySnapshot2 = await getDocs(query(collection(db, "adicionais")))
         querySnapshot2.forEach((doc) => {
@@ -32,12 +37,45 @@ export default {
             }
             this.adicionais = result
         })
+    },
+    methods: {
+        adicionarCarrinho() {
+            var novo_carrinho = []
+            var novo_acai = {
+                acai: this.acai.titulo,
+                adicionais: {
+                    basicos: basicos ? basicos : null,
+                    avancados: avancados ? avancados : null
+                },
+                preco: this.preco,
+                quantidade: 1
+            }
+
+            const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
+
+            if (carrinho != null) {
+                for (let i = 0; i < carrinho.length; i++) {
+                    if (JSON.stringify(novo_acai.acai) == JSON.stringify(carrinho[i].acai) && JSON.stringify(novo_acai.adicionais) == JSON.stringify(carrinho[i].adicionais)) {
+                        novo_acai.quantidade += carrinho[i].quantidade
+                        novo_carrinho.push(novo_acai)
+                    } else {
+                        novo_carrinho.push(carrinho[i])
+                    }
+                }
+            } else {
+                novo_carrinho.push(novo_acai)
+            }
+
+            localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
+
+            console.log(novo_carrinho);
+        }
     }
 }
 </script>
 
 <template>
-    <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;">
+    <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="acai">
         <div class="row">
             <div class="col-md-7">
                 <div class="card bg-purple-white text-white mb-3">
@@ -54,8 +92,9 @@ export default {
                         <p class="fs-5 fw-semibold m-0">R${{ preco }}</p>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary"><i class="bi bi-cart-plus-fill"></i> Adicionar ao carrinho</button>
-
+                <button type="button" class="btn btn-primary" v-on:click="adicionarCarrinho()"><i
+                        class="bi bi-cart-plus-fill"></i> Adicionar ao
+                    carrinho</button>
             </div>
             <div class="col-md-5">
                 <div class="row">
