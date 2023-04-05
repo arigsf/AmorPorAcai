@@ -3,6 +3,7 @@
 }
 
 .bg-purple-white {
+    --bs-list-group-bg: #7f008d !important;
     background-color: #7f008d !important;
 }
 

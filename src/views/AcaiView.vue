@@ -69,10 +69,15 @@ export default {
                 }
             } else {
                 novo_carrinho.push(novo_acai)
+                adicionar = false
             }
 
             if (adicionar == true) {
                 novo_carrinho.push(novo_acai)
+            }
+
+            for (let i = 0; i < novo_carrinho.length; i++) {
+                novo_carrinho[i].id = i + 1
             }
 
             localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
@@ -88,10 +93,17 @@ export default {
             <div class="col-md-7">
                 <div class="card bg-purple-white text-white mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">{{ acai.titulo }}</h5>
-                        <ul class="my-0">
-                            <li v-for="incluso in acai.incluso">{{ incluso }}</li>
-                        </ul>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="card-title">{{ acai.titulo }}</h5>
+                                <ul class="my-0">
+                                    <li v-for="incluso in acai.incluso">{{ incluso }}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <img src="../assets/img/acai-puro.png" class="d-block mx-auto img-fluid">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card bg-purple-white text-white mb-3">
@@ -100,7 +112,7 @@ export default {
                         <p class="fs-5 fw-semibold m-0">R${{ preco }}</p>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" v-on:click="adicionarCarrinho()"><i
+                <button type="button" class="btn btn-primary mb-4" v-on:click="adicionarCarrinho()"><i
                         class="bi bi-cart-plus-fill"></i> Adicionar ao
                     carrinho</button>
             </div>
@@ -108,7 +120,7 @@ export default {
                 <div class="row">
                     <div class="col-6">
                         <div class="d-flex flex-column flex-md-row justify-content-center">
-                            <div class="list-group list-group-checkable gap-2 border-0">
+                            <div class="list-group list-group-checkable gap-2 border-0 mx-0">
                                 <p class="fs-6 fw-semibold m-0">Adicionais básicos</p>
                                 <div v-for="basico in adicionais.basicos">
                                     <input class="list-group-item-check pe-none" type="checkbox" name="basicos"
@@ -123,7 +135,7 @@ export default {
                     </div>
                     <div class="col-6">
                         <div class="d-flex flex-column flex-md-row justify-content-center">
-                            <div class="list-group list-group-checkable gap-2 border-0">
+                            <div class="list-group list-group-checkable gap-2 border-0 mx-0">
                                 <p class="fs-6 fw-semibold m-0">Adicionais avançados</p>
                                 <div v-for="avancado in adicionais.avancados">
                                     <input class="list-group-item-check pe-none" type="checkbox" name="avancados"
