@@ -1,7 +1,6 @@
 <script>
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
-import { ref } from "vue"
 
 export default {
     name: 'AcaiView',
@@ -73,13 +72,11 @@ export default {
             }
 
             if (adicionar == true) {
-                novo_carrinho.push(novo_acai)                
+                novo_carrinho.push(novo_acai)
             }
 
             localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
-            this.basicos = []
-            this.avancados = []
-            this.preco = this.acai.preco
+            this.$router.go({ path: this.path })
         }
     }
 }
