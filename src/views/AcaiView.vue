@@ -3,16 +3,15 @@ import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
 import { ref } from "vue"
 
-const basicos = ref([])
-const avancados = ref([])
-
 export default {
     name: 'AcaiView',
     data() {
         return {
             acai: null,
             adicionais: [],
-            preco: null
+            preco: null,
+            basicos: [],
+            avancados: []
         }
     },
     async created() {
@@ -33,19 +32,25 @@ export default {
             const result = {
                 avancados: doc.data().avancados,
                 basicos: doc.data().basicos,
-                entrega: doc.data().entrega
+                entrega: doc.data().entrega,
+                preco_basico: doc.data().preco_basico,
+                preco_avancado: doc.data().preco_avancado
             }
             this.adicionais = result
         })
     },
     methods: {
+        atualizarPreco() {
+            this.preco = this.acai.preco + this.adicionais.preco_basico * this.basicos.length + this.adicionais.preco_avancado * this.avancados.length
+        },
         adicionarCarrinho() {
+            var adicionar = true
             var novo_carrinho = []
             var novo_acai = {
                 acai: this.acai.titulo,
                 adicionais: {
-                    basicos: basicos ? basicos : null,
-                    avancados: avancados ? avancados : null
+                    basicos: this.basicos ? this.basicos : null,
+                    avancados: this.avancados ? this.avancados : null
                 },
                 preco: this.preco,
                 quantidade: 1
@@ -58,6 +63,7 @@ export default {
                     if (JSON.stringify(novo_acai.acai) == JSON.stringify(carrinho[i].acai) && JSON.stringify(novo_acai.adicionais) == JSON.stringify(carrinho[i].adicionais)) {
                         novo_acai.quantidade += carrinho[i].quantidade
                         novo_carrinho.push(novo_acai)
+                        adicionar = false
                     } else {
                         novo_carrinho.push(carrinho[i])
                     }
@@ -66,9 +72,14 @@ export default {
                 novo_carrinho.push(novo_acai)
             }
 
-            localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
+            if (adicionar == true) {
+                novo_carrinho.push(novo_acai)                
+            }
 
-            console.log(novo_carrinho);
+            localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
+            this.basicos = []
+            this.avancados = []
+            this.preco = this.acai.preco
         }
     }
 }
@@ -104,7 +115,8 @@ export default {
                                 <p class="fs-6 fw-semibold m-0">Adicionais básicos</p>
                                 <div v-for="basico in adicionais.basicos">
                                     <input class="list-group-item-check pe-none" type="checkbox" name="basicos"
-                                        v-bind:id="basico" v-bind:value="basico">
+                                        v-bind:id="basico" v-bind:value="basico" v-model="basicos"
+                                        v-on:change="atualizarPreco()">
                                     <label class="list-group-item rounded-3 py-2" v-bind:for="basico">
                                         {{ basico }}
                                     </label>
@@ -118,7 +130,8 @@ export default {
                                 <p class="fs-6 fw-semibold m-0">Adicionais avançados</p>
                                 <div v-for="avancado in adicionais.avancados">
                                     <input class="list-group-item-check pe-none" type="checkbox" name="avancados"
-                                        v-bind:id="avancado" v-bind:value="avancado">
+                                        v-bind:id="avancado" v-bind:value="avancado" v-model="avancados"
+                                        v-on:change="atualizarPreco()">
                                     <label class="list-group-item rounded-3 py-2" v-bind:for="avancado">
                                         {{ avancado }}
                                     </label>
