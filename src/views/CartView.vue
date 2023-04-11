@@ -1,6 +1,9 @@
 <script>
-import { collection, query, where, getDocs } from "firebase/firestore"
+import { collection, query, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
+import { auth } from "../firebase/index"
+import { useOrderStore } from "../stores/order"
+const orderStore = useOrderStore()
 
 export default {
     name: 'CartView',
@@ -80,8 +83,21 @@ export default {
                 }
             }
         },
-        finalizarPedido(){
-            
+        finalizarPedido() {
+            if (auth.currentUser) {
+                alert("Faça login!")
+            } else if (this.entrega) {
+                alert("Selecione um método de entrega")
+            } else if (this.pagamento) {
+                alert("Selecione um método de pagamento")
+            } else {
+                const endereco = auth.currentUser.endereco
+                if (this.entrega == 'Retirar') {
+                    endereco = null
+                }
+
+                orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, this.total, 'Pendente', endereco)
+            }
         }
     }
 }
