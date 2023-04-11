@@ -1,14 +1,31 @@
 <script>
+import { collection, query, where, getDocs } from "firebase/firestore"
+import { db } from "../firebase"
+
 export default {
     name: 'CartView',
     data() {
         return {
             acais: null,
+            entrega: 'Retirar',
+            pagamento: 'Cartão de débito',
+            taxa_entrega: null,
+            subtotal: 0,
+            total: 0,
         }
     },
     async created() {
         const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
         this.acais = carrinho
+        this.alterarSubtotal()
+
+        const querySnapshot = await getDocs(query(collection(db, "adicionais")))
+        querySnapshot.forEach((doc) => {
+            const result = {
+                taxa_entrega: doc.data().taxa_entrega,
+            }
+            this.taxa_entrega = result.taxa_entrega
+        })
     },
     methods: {
         diminuirQuantidade(id) {
@@ -35,6 +52,8 @@ export default {
             } else {
                 localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
             }
+
+            this.alterarSubtotal()
         },
         aumentarQuantidade(id) {
             var novo_carrinho = []
@@ -47,6 +66,22 @@ export default {
                 novo_carrinho.push(this.acais[i])
                 localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
             }
+
+            this.alterarSubtotal()
+        },
+        alterarSubtotal() {
+            const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
+
+            if (carrinho != null) {
+                for (let i = 0; i < carrinho.length; i++) {
+                    const acai = carrinho[i]
+                    this.subtotal = 0
+                    this.subtotal += acai.preco * acai.quantidade
+                }
+            }
+        },
+        finalizarPedido(){
+            
         }
     }
 }
@@ -94,19 +129,33 @@ export default {
                 <div class="card bg-purple-white text-white mb-3">
                     <div class="card-body">
                         <h6 class="card-title">Entrega</h6>
-                        <select class="form-select my-3">
-                            <option selected></option>
-                            <option value="1">Retirar no local</option>
-                            <option value="2">Entregar no meu endereço</option>
+                        <select class="form-select my-3" v-model="entrega">
+                            <option value="Retirar">Retirar no local</option>
+                            <option value="Entregar">Entregar no meu endereço</option>
                         </select>
                         <h6 class="card-title">Pagamento no ato da entrega via</h6>
-                        <select class="form-select my-3">
-                            <option selected></option>
-                            <option value="1">Cartão de débito</option>
-                            <option value="2">Dinheiro</option>
-                            <option value="2">Pix</option>
+                        <select class="form-select my-3" v-model="pagamento">
+                            <option value="Cartão de débito">Cartão de débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Pix">Pix</option>
                         </select>
                         <h6 class="card-title">Resumo do seu pedido</h6>
+                        <div class="d-flex justify-content-between" v-if="entrega == 'Entregar'">
+                            <span>Subtotal</span>
+                            <span>R${{ subtotal }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between" v-if="entrega == 'Entregar'">
+                            <span>Taxa de entrega</span>
+                            <span>R${{ taxa_entrega }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Total</span>
+                            <span v-if="entrega == 'Entregar'">R${{ subtotal + taxa_entrega }}</span>
+                            <span v-if="entrega == 'Retirar'">R${{ subtotal }}</span>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" v-on:click="finalizarPedido()"><i
+                                class="bi bi-cart-check-fill"></i> Finalizar
+                            pedido</button>
                     </div>
                 </div>
             </div>

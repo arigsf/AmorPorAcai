@@ -31,7 +31,7 @@ export default {
             const result = {
                 avancados: doc.data().avancados,
                 basicos: doc.data().basicos,
-                entrega: doc.data().entrega,
+                taxa_entrega: doc.data().taxa_entrega,
                 preco_basico: doc.data().preco_basico,
                 preco_avancado: doc.data().preco_avancado
             }
