@@ -84,19 +84,23 @@ export default {
             }
         },
         finalizarPedido() {
-            if (auth.currentUser) {
+            if (!auth.currentUser) {
                 alert("Faça login!")
-            } else if (this.entrega) {
+            } else if (!this.entrega) {
                 alert("Selecione um método de entrega")
-            } else if (this.pagamento) {
+            } else if (!this.pagamento) {
                 alert("Selecione um método de pagamento")
             } else {
-                const endereco = auth.currentUser.endereco
+                let total = this.subtotal
+                let endereco = auth.currentUser.photoURL
+
                 if (this.entrega == 'Retirar') {
                     endereco = null
+                } else if (this.entrega == 'Entregar') {
+                    total += this.taxa_entrega
                 }
 
-                orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, this.total, 'Pendente', endereco)
+                orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, total, 'Pendente', endereco)
             }
         }
     }
