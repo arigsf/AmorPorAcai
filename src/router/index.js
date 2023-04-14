@@ -31,6 +31,22 @@ const router = createRouter({
       meta: {
         auth: true
       }
+    },
+    {
+      path: '/pedidos',
+      name: 'pedidos',
+      component: () => import('../views/MyOrders.vue'),
+      meta: {
+        auth: true
+      }
+    },
+    {
+      path: '/pedido/:pedido',
+      name: 'pedido',
+      component: () => import('../views/ViewOrder.vue'),
+      meta: {
+        auth: true
+      }
     }
   ]
 })

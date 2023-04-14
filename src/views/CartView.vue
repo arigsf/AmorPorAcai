@@ -1,7 +1,6 @@
 <script>
 import { collection, query, getDocs } from "firebase/firestore"
-import { db } from "../firebase"
-import { auth } from "../firebase/index"
+import { auth, db } from "../firebase"
 import { useOrderStore } from "../stores/order"
 const orderStore = useOrderStore()
 
@@ -100,6 +99,7 @@ export default {
                     total += this.taxa_entrega
                 }
 
+                localStorage.setItem("carrinho", null)
                 orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, total, 'Pendente', endereco)
             }
         }
