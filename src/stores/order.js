@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { collection, addDoc } from "firebase/firestore"
+import { collection, addDoc, doc } from "firebase/firestore"
 import { db } from "../firebase"
 
 export const useOrderStore = defineStore("orders", {

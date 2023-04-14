@@ -35,7 +35,7 @@ const router = createRouter({
     {
       path: '/pedidos',
       name: 'pedidos',
-      component: () => import('../views/MyOrders.vue'),
+      component: () => import('../views/MyOrdersView.vue'),
       meta: {
         auth: true
       }
@@ -43,7 +43,7 @@ const router = createRouter({
     {
       path: '/pedido/:pedido',
       name: 'pedido',
-      component: () => import('../views/ViewOrder.vue'),
+      component: () => import('../views/OrderView.vue'),
       meta: {
         auth: true
       }

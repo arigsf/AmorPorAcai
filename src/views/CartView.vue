@@ -182,13 +182,13 @@ export default {
         </div>
     </section>
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="!acais">
-        <ol class="list-group" style="max-width: 100% !important; margin-inline: 0 !important;">
+        <ul class="list-group" style="max-width: 100% !important; margin-inline: 0 !important;">
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="ms-2 me-auto">
                     <div class="fw-bold">Seu carrinho está vazio</div>
                 </div>
                 <a href="/" class="btn btn-primary"><i class="bi bi-cart-plus-fill"></i> Adicionar açaí</a>
             </li>
-        </ol>
+        </ul>
     </section>
 </template>

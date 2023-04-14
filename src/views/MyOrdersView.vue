@@ -6,7 +6,7 @@ export default {
     name: 'MyOrdersView',
     data() {
         return {
-            pedidos: []
+            pedidos: null
         }
     },
     async created() {
@@ -27,7 +27,7 @@ export default {
                 }
                 pedidos.push(pedido)
             })
-            this.pedidos = pedidos
+            this.pedidos = (pedidos.length > 0) ? pedidos : null
         })
     }
 }
