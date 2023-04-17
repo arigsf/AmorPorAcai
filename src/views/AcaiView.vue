@@ -1,6 +1,8 @@
 <script>
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
+import SuccessNotificationComponent from "../components/SuccessNotificationComponent.vue"
+import DangerNotificationComponent from "../components/DangerNotificationComponent.vue"
 
 export default {
     name: 'AcaiView',
@@ -10,7 +12,9 @@ export default {
             adicionais: [],
             preco: null,
             basicos: [],
-            avancados: []
+            avancados: [],
+            success_msg: null,
+            danger_msg: null,
         }
     },
     async created() {
@@ -81,13 +85,20 @@ export default {
             }
 
             localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
-            this.$router.go({ path: this.path })
+            this.success_msg = "Açaí adicionado ao carrinho com sucesso!"
+            setTimeout(() => {
+                this.success_msg = null
+                this.$router.go({ path: this.path })
+            }, "5000")
         }
-    }
+    },
+    components: { SuccessNotificationComponent, DangerNotificationComponent }
 }
 </script>
 
 <template>
+    <SuccessNotificationComponent :msg="success_msg" v-show="success_msg" />
+    <DangerNotificationComponent :msg="danger_msg" v-show="danger_msg" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="acai">
         <div class="row">
             <div class="col-md-7">

@@ -2,78 +2,74 @@
 import { collection, query, getDocs } from "firebase/firestore"
 import { auth, db } from "../firebase"
 import { useOrderStore } from "../stores/order"
+import SuccessNotificationComponent from "../components/SuccessNotificationComponent.vue"
+import DangerNotificationComponent from "../components/DangerNotificationComponent.vue"
 const orderStore = useOrderStore()
 
 export default {
-    name: 'CartView',
+    name: "CartView",
     data() {
         return {
             acais: null,
-            entrega: 'Retirar',
-            pagamento: 'Cartão de débito',
+            entrega: "Retirar",
+            pagamento: "Cartão de débito",
             taxa_entrega: null,
             subtotal: 0,
             total: 0,
-        }
+            success_msg: null,
+            danger_msg: null,
+        };
     },
     async created() {
         const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
         this.acais = carrinho
         this.alterarSubtotal()
-
         const querySnapshot = await getDocs(query(collection(db, "adicionais")))
         querySnapshot.forEach((doc) => {
             const result = {
                 taxa_entrega: doc.data().taxa_entrega,
-            }
+            };
             this.taxa_entrega = result.taxa_entrega
-        })
+        });
     },
     methods: {
         diminuirQuantidade(id) {
             var adicionar = true
-            var novo_carrinho = []
-
+            var novo_carrinho = [];
             for (let i = 0; i < this.acais.length; i++) {
                 if (this.acais[i].id == id) {
-                    this.acais[i].quantidade--
+                    this.acais[i].quantidade--;
                     if (this.acais[i].quantidade <= 0) {
-                        adicionar = false
+                        adicionar = false;
                     }
                 }
-
                 if (adicionar == true) {
                     novo_carrinho.push(this.acais[i])
                 }
             }
-
-            this.acais = novo_carrinho
+            this.acais = novo_carrinho;
             if (novo_carrinho.length == 0) {
                 localStorage.setItem("carrinho", null)
-                this.$router.go({ path: this.$router.path })
-            } else {
-                localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
+                this.$router.go({ path: this.$router.path });
             }
-
-            this.alterarSubtotal()
+            else {
+                localStorage.setItem("carrinho", JSON.stringify(novo_carrinho));
+            }
+            this.alterarSubtotal();
         },
         aumentarQuantidade(id) {
-            var novo_carrinho = []
-
+            var novo_carrinho = [];
             for (let i = 0; i < this.acais.length; i++) {
                 if (this.acais[i].id == id) {
                     this.acais[i].quantidade++
                 }
-
                 novo_carrinho.push(this.acais[i])
                 localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
             }
-
             this.alterarSubtotal()
         },
         alterarSubtotal() {
-            const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
-
+            const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null;
             if (carrinho != null) {
                 for (let i = 0; i < carrinho.length; i++) {
                     const acai = carrinho[i]
@@ -84,33 +80,54 @@ export default {
         },
         finalizarPedido() {
             if (!auth.currentUser) {
-                alert("Faça login!")
-            } else if (!this.entrega) {
-                alert("Selecione um método de entrega")
-            } else if (!this.pagamento) {
-                alert("Selecione um método de pagamento")
-            } else {
+                this.danger_msg = "Você precisa estar logado para finalizar o pedido!"
+                setTimeout(() => {
+                    this.danger_msg = null
+                }, "5000")
+            }
+            else if (!this.entrega) {
+                this.danger_msg = "Selecione um método de entrega!"
+                setTimeout(() => {
+                    this.danger_msg = null
+                }, "5000")
+                alert("")
+            }
+            else if (!this.pagamento) {
+                this.danger_msg = "Selecione um método de pagamento!"
+                setTimeout(() => {
+                    this.danger_msg = null
+                }, "5000")
+            }
+            else {
                 let taxa_entrega = this.taxa_entrega
                 let subtotal = this.subtotal
                 let total = this.subtotal
                 let endereco = auth.currentUser.photoURL
-
-                if (this.entrega == 'Retirar') {
+                if (this.entrega == "Retirar") {
                     taxa_entrega = null
                     endereco = null
-                } else if (this.entrega == 'Entregar') {
+                }
+                else if (this.entrega == "Entregar") {
                     total += this.taxa_entrega
                 }
-
                 localStorage.setItem("carrinho", null)
-                orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, subtotal, taxa_entrega, total, 'Pendente', endereco)
+                orderStore.add(auth.currentUser.displayName, auth.currentUser.uid, this.acais, this.entrega, this.pagamento, subtotal, taxa_entrega, total, "Pendente", endereco)
+
+                this.success_msg = "Pedido realizado com sucesso!"
+                setTimeout(() => {
+                    this.success_msg = null
+                    this.$router.go({ path: this.path })
+                }, "5000")
             }
         }
-    }
+    },
+    components: { SuccessNotificationComponent, DangerNotificationComponent }
 }
 </script>
 
 <template>
+    <SuccessNotificationComponent :msg="success_msg" v-show="success_msg" />
+    <DangerNotificationComponent :msg="danger_msg" v-show="danger_msg" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="acais">
         <div class="row">
             <div class="col-md-7">

@@ -27,10 +27,7 @@ const router = createRouter({
     {
       path: '/carrinho',
       name: 'carrinho',
-      component: () => import('../views/CartView.vue'),
-      meta: {
-        auth: true
-      }
+      component: () => import('../views/CartView.vue')
     },
     {
       path: '/pedidos',

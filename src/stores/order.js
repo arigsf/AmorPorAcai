@@ -18,7 +18,6 @@ export const useOrderStore = defineStore("orders", {
                     status: status,
                     endereco: endereco,
                 })
-                this.$router.go({ path: this.$router.path })
             } catch (error) {
                 alert(error)
             }

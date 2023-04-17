@@ -40,6 +40,7 @@ export default {
                             <h6>Pedido #{{ pedido.id }}</h6>
                             <span class="badge bg-primary fs-6">{{ pedido.status }}</span>
                         </div>
+                        <small class="text-white-50">Acompanhe seu pedido, que é atualizado automaticamente.</small>
                     </div>
                 </div>
             </div>
