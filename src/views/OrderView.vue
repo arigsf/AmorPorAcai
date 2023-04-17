@@ -1,5 +1,5 @@
 <script>
-import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase"
 
 export default {
@@ -10,22 +10,21 @@ export default {
         }
     },
     async created() {
-        const q = query(collection(db, "pedidos"), where("id", "==", this.$route.params.pedido))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                const pedido = {
-                    id: doc.id,
-                    cliente: doc.data().cliente,
-                    uid: doc.data().uid,
-                    acais: doc.data().acais,
-                    entrega: doc.data().entrega,
-                    pagamento: doc.data().pagamento,
-                    total: doc.data().total,
-                    status: doc.data().status,
-                    endereco: doc.data().endereco,
-                }
-                this.pedido = (pedido) ? pedido : null
-            })
+        const unsub = onSnapshot(doc(db, "pedidos", this.$route.params.pedido), (doc) => {
+            const pedido = {
+                id: doc.id,
+                cliente: doc.data().cliente,
+                uid: doc.data().uid,
+                acais: doc.data().acais,
+                entrega: doc.data().entrega,
+                pagamento: doc.data().pagamento,
+                subtotal: doc.data().subtotal,
+                taxa_entrega: doc.data().taxa_entrega,
+                total: doc.data().total,
+                status: doc.data().status,
+                endereco: doc.data().endereco,
+            }
+            this.pedido = (pedido) ? pedido : null
         })
     }
 }
@@ -33,6 +32,18 @@ export default {
 
 <template>
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="pedido">
+        <div class="row">
+            <div class="me-auto">
+                <div class="card bg-purple-white text-white mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6>Pedido #{{ pedido.id }}</h6>
+                            <span class="badge bg-primary fs-6">{{ pedido.status }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-7">
                 <ol class="list-group list-group-numbered bg-purple-white p-2"
@@ -58,7 +69,10 @@ export default {
                         </div>
                         <div class="d-flex align-items-center">
                             <span class="badge bg-primary fs-6 mx-2">R${{ acai.preco }}</span>
-                            <span class="badge bg-primary fs-6">Quantidade: {{ acai.quantidade }}</span>
+                            <span class="badge bg-primary fs-6" v-if="acai.quantidade == 1">{{ acai.quantidade }}
+                                unidade</span>
+                            <span class="badge bg-primary fs-6" v-if="acai.quantidade > 1">{{ acai.quantidade }}
+                                unidades</span>
                         </div>
                     </li>
                 </ol>
@@ -66,11 +80,23 @@ export default {
             <div class="col-md-5">
                 <div class="card bg-purple-white text-white mb-3">
                     <div class="card-body">
-                        <h6 class="card-title">Entrega:</h6>
-                        <h6>{{ pedido.entrega }}</h6>
+                        <h6 class="card-title">Entrega</h6>
+                        <select class="form-select my-3" disabled>
+                            <option>{{ pedido.entrega }}</option>
+                        </select>
                         <h6 class="card-title">Pagamento no ato da entrega via</h6>
-                        <h6>{{ pedido.pagamento }}</h6>
+                        <select class="form-select my-3" disabled>
+                            <option>{{ pedido.pagamento }}</option>
+                        </select>
                         <h6 class="card-title">Resumo do seu pedido</h6>
+                        <div class="d-flex justify-content-between" v-if="pedido.entrega == 'Entregar'">
+                            <span>Subtotal</span>
+                            <span>R${{ pedido.subtotal }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between" v-if="pedido.entrega == 'Entregar'">
+                            <span>Taxa de entrega</span>
+                            <span>R${{ pedido.taxa_entrega }}</span>
+                        </div>
                         <div class="d-flex justify-content-between">
                             <span>Total</span>
                             <span>R${{ pedido.total }}</span>

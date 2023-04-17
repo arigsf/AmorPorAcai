@@ -4,7 +4,7 @@ import { db } from "../firebase"
 
 export const useOrderStore = defineStore("orders", {
     actions: {
-        async add(cliente, uid, acais, entrega, pagamento, total, status, endereco) {
+        async add(cliente, uid, acais, entrega, pagamento, subtotal, taxa_entrega, total, status, endereco) {
             try {
                 await addDoc(collection(db, "pedidos"), {
                     cliente: cliente,
@@ -12,6 +12,8 @@ export const useOrderStore = defineStore("orders", {
                     acais: acais,
                     entrega: entrega,
                     pagamento: pagamento,
+                    subtotal: subtotal,
+                    taxa_entrega: taxa_entrega,
                     total: total,
                     status: status,
                     endereco: endereco,
