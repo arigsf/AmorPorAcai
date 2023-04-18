@@ -38,9 +38,9 @@ export default {
     },
     methods: {
         diminuirQuantidade(id) {
-            var adicionar = true
-            var novo_carrinho = [];
+            var novo_carrinho = []
             for (let i = 0; i < this.acais.length; i++) {
+                var adicionar = true
                 if (this.acais[i].id == id) {
                     this.acais[i].quantidade--;
                     if (this.acais[i].quantidade <= 0) {
@@ -51,15 +51,15 @@ export default {
                     novo_carrinho.push(this.acais[i])
                 }
             }
-            this.acais = novo_carrinho;
+            this.acais = novo_carrinho
             if (novo_carrinho.length == 0) {
                 localStorage.setItem("carrinho", null)
-                this.$router.go({ path: this.$router.path });
             }
             else {
-                localStorage.setItem("carrinho", JSON.stringify(novo_carrinho));
+                localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
             }
-            this.alterarSubtotal();
+            this.alterarSubtotal()
+            this.$router.go({ path: this.$router.path })
         },
         aumentarQuantidade(id) {
             var novo_carrinho = [];
@@ -71,13 +71,14 @@ export default {
                 localStorage.setItem("carrinho", JSON.stringify(novo_carrinho))
             }
             this.alterarSubtotal()
+            this.$router.go({ path: this.$router.path })
         },
         alterarSubtotal() {
             const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null;
             if (carrinho != null) {
+                this.subtotal = 0
                 for (let i = 0; i < carrinho.length; i++) {
                     const acai = carrinho[i]
-                    this.subtotal = 0
                     this.subtotal += acai.preco * acai.quantidade
                 }
             }

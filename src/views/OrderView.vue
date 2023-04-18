@@ -46,7 +46,14 @@ export default {
                             <h6>Pedido #{{ pedido.id }}</h6>
                             <span class="badge bg-primary fs-6">{{ pedido.status }}</span>
                         </div>
-                        <small class="text-white-50">Acompanhe seu pedido, que é atualizado automaticamente.</small>
+                        <small>Acompanhe seu pedido, que é atualizado automaticamente.</small><br>
+                        <small v-if="pedido.status == 'Pendente'">Seu pedido foi enviado para o Amor de Açaí e está sendo
+                            analisado.</small>
+                        <small v-if="pedido.status == 'Preparando'">Seu pedido já está sendo preparado pelo Amor de
+                            Açaí.</small>
+                        <small v-if="pedido.status == 'Entrega'">Seu pedido saiu para entrega, fique ligado!</small>
+                        <small v-if="pedido.status == 'Concluído'">Seu pedido foi concluído com sucesso!</small>
+                        <small v-if="pedido.status == 'Cancelado'">Seu pedido foi cancelado.</small>
                     </div>
                 </div>
             </div>
