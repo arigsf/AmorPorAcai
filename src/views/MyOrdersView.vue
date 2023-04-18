@@ -1,15 +1,18 @@
 <script>
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { auth, db } from "../firebase"
+import LoadingComponent from "../components/LoadingComponent.vue"
 
 export default {
     name: 'MyOrdersView',
     data() {
         return {
-            pedidos: null
+            pedidos: null,
+            loading: null,
         }
     },
     async created() {
+        this.loading = true
         const q = query(collection(db, "pedidos"), where("uid", "==", auth.currentUser.uid))
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const pedidos = []
@@ -29,27 +32,33 @@ export default {
             })
             this.pedidos = (pedidos.length > 0) ? pedidos : null
         })
-    }
+        this.loading = null
+    },
+    components: { LoadingComponent }
 }
 </script>
 
 <template>
+    <LoadingComponent v-show="loading" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="pedidos">
         <div class="row">
-            <ul class="list-group bg-purple-white p-2" style="max-width: 100% !important; margin-inline: 0 !important;">
-                <router-link v-bind:to="{ name: 'pedido', params: { pedido: pedido.id } }" class="text-decoration-none"
+            <ol class="list-group list-group-numbered bg-purple-white p-2"
+                style="max-width: 100% !important; margin-inline: 0 !important;">
+                <li class="list-group-item d-flex justify-content-between align-items-start border-0 text-white"
                     v-for="pedido in pedidos">
-                    <li class="list-group-item d-flex justify-content-between align-items-start border-0 text-white">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Pedido #{{ pedido.id }}</h6>
-                            <div class="d-flex">
-                                <h6><span class="badge bg-primary mx-2">{{ pedido.status }}</span></h6>
-                                <h6><span class="badge bg-primary">{{ pedido.data }}</span></h6>
-                            </div>
-                        </div>
-                    </li>
-                </router-link>
-            </ul>
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Pedido #{{ pedido.id }}</div>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary mx-2">{{ pedido.status }}</span>
+                        <span class="badge bg-primary">{{ pedido.data }}</span>
+                        <router-link v-bind:to="{ name: 'pedido', params: { pedido: pedido.id } }"
+                            class="text-decoration-none"><button type="button" class="btn btn-sm btn-primary"><i
+                                    class="bi bi-eye-fill"></i></button>
+                        </router-link>
+                    </div>
+                </li>
+            </ol>
         </div>
     </section>
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="!pedidos">

@@ -1,15 +1,18 @@
 <script>
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase"
+import LoadingComponent from "../components/LoadingComponent.vue"
 
 export default {
     name: 'OrderView',
     data() {
         return {
-            pedido: null
+            pedido: null,
+            loading: null,
         }
     },
     async created() {
+        this.loading = true
         const unsub = onSnapshot(doc(db, "pedidos", this.$route.params.pedido), (doc) => {
             const pedido = {
                 id: doc.id,
@@ -26,11 +29,14 @@ export default {
             }
             this.pedido = (pedido) ? pedido : null
         })
-    }
+        this.loading = null
+    },
+    components: { LoadingComponent }
 }
 </script>
 
 <template>
+    <LoadingComponent v-show="loading" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="pedido">
         <div class="row">
             <div class="me-auto">

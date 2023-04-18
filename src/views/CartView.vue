@@ -4,6 +4,7 @@ import { auth, db } from "../firebase"
 import { useOrderStore } from "../stores/order"
 import SuccessNotificationComponent from "../components/SuccessNotificationComponent.vue"
 import DangerNotificationComponent from "../components/DangerNotificationComponent.vue"
+import LoadingComponent from "../components/LoadingComponent.vue"
 const orderStore = useOrderStore()
 
 export default {
@@ -18,9 +19,11 @@ export default {
             total: 0,
             success_msg: null,
             danger_msg: null,
-        };
+            loading: null,
+        }
     },
     async created() {
+        this.loading = true
         const carrinho = localStorage.getItem("carrinho") ? JSON.parse(localStorage.getItem("carrinho")) : null
         this.acais = carrinho
         this.alterarSubtotal()
@@ -30,7 +33,8 @@ export default {
                 taxa_entrega: doc.data().taxa_entrega,
             };
             this.taxa_entrega = result.taxa_entrega
-        });
+        })
+        this.loading = null
     },
     methods: {
         diminuirQuantidade(id) {
@@ -121,13 +125,14 @@ export default {
             }
         }
     },
-    components: { SuccessNotificationComponent, DangerNotificationComponent }
+    components: { SuccessNotificationComponent, DangerNotificationComponent, LoadingComponent }
 }
 </script>
 
 <template>
     <SuccessNotificationComponent :msg="success_msg" v-show="success_msg" />
     <DangerNotificationComponent :msg="danger_msg" v-show="danger_msg" />
+    <LoadingComponent v-show="loading" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="acais">
         <div class="row">
             <div class="col-md-7">

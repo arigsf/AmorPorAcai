@@ -3,6 +3,7 @@ import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
 import SuccessNotificationComponent from "../components/SuccessNotificationComponent.vue"
 import DangerNotificationComponent from "../components/DangerNotificationComponent.vue"
+import LoadingComponent from "../components/LoadingComponent.vue"
 
 export default {
     name: 'AcaiView',
@@ -15,9 +16,11 @@ export default {
             avancados: [],
             success_msg: null,
             danger_msg: null,
+            loading: null,
         }
     },
     async created() {
+        this.loading = true
         const querySnapshot = await getDocs(query(collection(db, "acais"), where("slug", "==", this.$route.params.acai)))
         querySnapshot.forEach((doc) => {
             const result = {
@@ -41,6 +44,7 @@ export default {
             }
             this.adicionais = result
         })
+        this.loading = null
     },
     methods: {
         atualizarPreco() {
@@ -92,13 +96,14 @@ export default {
             }, "5000")
         }
     },
-    components: { SuccessNotificationComponent, DangerNotificationComponent }
+    components: { SuccessNotificationComponent, DangerNotificationComponent, LoadingComponent }
 }
 </script>
 
 <template>
     <SuccessNotificationComponent :msg="success_msg" v-show="success_msg" />
     <DangerNotificationComponent :msg="danger_msg" v-show="danger_msg" />
+    <LoadingComponent v-show="loading" />
     <section class="p-4 bg-purple-dark text-white" style="min-height: 82vh;" v-if="acai">
         <div class="row">
             <div class="col-md-7">

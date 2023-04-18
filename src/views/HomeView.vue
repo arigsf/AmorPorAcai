@@ -1,15 +1,18 @@
 <script>
 import { collection, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
+import LoadingComponent from "../components/LoadingComponent.vue"
 
 export default {
   name: 'HomeView',
   data() {
     return {
-      acais: null
+      acais: null,
+      loading: null,
     }
   },
   async created() {
+    this.loading = true
     const querySnapshot = await getDocs(collection(db, "acais"))
     let results = []
     querySnapshot.forEach((doc) => {
@@ -23,11 +26,14 @@ export default {
       results.push(acai)
     })
     this.acais = results
-  }
+    this.loading = null
+  },
+  components: { LoadingComponent }
 }
 </script>
 
 <template>
+  <LoadingComponent v-show="loading" />
   <section>
     <div class="p-4 bg-purple-dark text-white">
       <div class="container col-xxl-8 px-4 mt-3">
